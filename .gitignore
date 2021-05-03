@@ -1,0 +1,11 @@
+# ignore everything
+*
+
+# except these directories
+!Doc
+
+# except these files
+!hangman.c
+!hangman.h
+!Makefile
+!.gitignore
