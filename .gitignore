@@ -2,10 +2,15 @@
 *
 
 # except these directories
-!Doc
+!doc
+!src
 
 # except these files
-!hangman.c
-!hangman.h
+!src/hangman.c
+!src/hangman.h
+
 !Makefile
 !.gitignore
+!.words
+
+!doc/hangman.6

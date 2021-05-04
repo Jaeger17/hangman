@@ -1,11 +1,11 @@
 CFLAGS += -Wall -Wextra -Wpedantic -Wwrite-strings -Wfloat-equal
 
-hangman:
+src/hangman:
 
 .PHONY: debug
 debug: CFLAGS += -g
-debug: hangman
+debug: src/hangman
 
 .PHONY: clean
 clean:
-	$(RM) *.o hangman
+	$(RM) src/*.o src/hangman .hangman
