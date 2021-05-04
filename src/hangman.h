@@ -4,9 +4,6 @@
  * @author Jaeger17 (jaeger17@protonmail.com)
  * @brief Header file for hangman.c, contains function prototpyes.
  * @date 2021-05-04
- * 
- * @copyright Copyright (c) 2021
- * 
  */
 
 #include <stdio.h>
@@ -36,10 +33,12 @@ void arg_check(int argc, char *argv[], char *tp);
 void get_stats(void);
 
 /**
- * @brief Get the target word
+ * @brief Get the target word. Inspiration for the design of this function came 
+ * from stack overflow. Names of variables were changed.
+ * Source: "https://tinyurl.com/y4pa3m5j", Users: DeadCake, JohnH, and paddy
  * 
- * @param tp 
- * @param fp 
+ * @param tp (char *): Pointer to target word.
+ * @param fp (FILE *): Pointer to the file that we are opening.
  */
 void get_target(char *tp, FILE *fp);
 
@@ -54,17 +53,18 @@ void get_target(char *tp, FILE *fp);
 void gen_rand(int size, char **words, char *tp);
 
 /**
- * @brief 
+ * @brief Display player game console.
  * 
- * @param tp 
+ * @param tp (char *): Pointer to target word.
  */
 void game_console(char *tp);
 
 /**
- * @brief 
+ * @brief Validate user input for hangman guesses. If the user correctly guesses
+ * an entire word they win the game.
  * 
- * @param tp 
- * @return char 
+ * @param tp (char *): Pointer to target word.
+ * @return (char): The player's character guess.
  */
 char input_val(char *tp);
 

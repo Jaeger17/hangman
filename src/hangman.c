@@ -1,9 +1,8 @@
-/*
- * developer:    Jaeger17
- * created:      11/05/2020
- * last changed: 11/07/2020
- * description:  Play Hangman! 6 incorrect guesses and you lose.
-*/
+/**
+ * @author Jaeger17 (jaeger17@protonmail.com)
+ * @brief Play Hangman! 6 incorrect guesses and you lose.
+ * @date 2021-05-04
+ */
 #include "hangman.h"
 
 struct stats {
@@ -25,7 +24,6 @@ int main(int argc, char *argv[])
         game_console(tp);
         set_stats();
 }
-
 
 void arg_check(int argc, char *argv[], char *tp)
 {
@@ -52,21 +50,13 @@ void arg_check(int argc, char *argv[], char *tp)
         }
 }
 
-/*
- * Get stats from the file .hangman. If the file does not exist, initialize the
- * stats struct "game" to all 0's.
- *
- * return - void
- */
 void get_stats(void)
 {
-        FILE *infile;  // infile file pointer
-
+        FILE *infile;
         infile = fopen("./.hangman", "r");
 
         if(!infile) {
-                fprintf(stderr, "Creating stats...\n");
-                // initialize game stats
+                puts("No '.hangman file', Creating stats...");
                 game.games = 1;
                 game.win = game.lose = game.score = 0;
                 printf("game %d. %d Win/%d Loss. Average score: %.2f\n",
@@ -87,18 +77,6 @@ void get_stats(void)
         }
 }
 
-/*
- * Inspiration for the design of this function came from stack overflow.
- * Names of variables were changed.
- * Source: "https://tinyurl.com/y4pa3m5j", Users: DeadCake, JohnH, and paddy
- *
- * Get the target random word from the file passed as a parameter.
- *
- * char *tp - a pointer to the target array.
- * FILE *fp - a pointer to the file that we are opening.
- *
- * return - void
- */
 void get_target(char *tp, FILE *fp)
 {
         char word[MAX];
@@ -106,9 +84,7 @@ void get_target(char *tp, FILE *fp)
         int allocate = 4;
         unsigned long alpha_count;
         unsigned long punct_count;
-        char **wp;  // words pointer (wp) points to words array
-
-        //fp = fopen("targets.txt", "r");
+        char **wp;
         wp = (char **) malloc(sizeof(char*) * allocate);
 
         while(fscanf(fp, "%s", word) != EOF) {
@@ -118,8 +94,8 @@ void get_target(char *tp, FILE *fp)
                         wp = (char **) realloc(wp, sizeof(char*) * allocate);
                 }
 
-                alpha_count = 0;  // rest the counter each time
-                punct_count = 0;  // rest the counter each time
+                alpha_count = 0;
+                punct_count = 0;
 
                 for(unsigned long i = 0; i <= strlen(word); i++) {
                         if((word[i] >= 'a' && word[i] <= 'z') ||
@@ -131,7 +107,7 @@ void get_target(char *tp, FILE *fp)
                         }
                 }
 
-                // this check makes sure that we aren't storing invalid words
+                // make sure that we aren't storing invalid words
                 if(alpha_count + punct_count == strlen(word)) {
                         wp[count] = (char *) malloc(sizeof(char) *
                                 (strlen(word) + 1));
@@ -159,28 +135,24 @@ void gen_rand(int size, char **words, char *tp)
         strcpy(tp, words[i]);
 }
 
-/*
- * The console where the user will interact with the hangman game.
- *
- * char *tp - a pointer to the target array.
- *
- * return - void
- */
 void game_console(char *tp)
 {
-        // Set a temporary pointer (tmp) to the target (tp) for comparison ops
+        /* 
+	 * Set a temporary pointer (tmp) to the target (tp) for comparison ops.
+	 * Consumed will "eat" valid correct answers so that I can count them
+         * as incorrect if the user attempts to guess it again.
+	 */
         char *tmp = calloc(strlen(tp) + 1, sizeof(*tmp));
         char *hidden = calloc(strlen(tp) + 1, sizeof(*hidden));
-        // consumed will eat valid correct answers so that I can count them
-        // as incorrect if the user attempts to guess it again
         char *consumed = calloc(strlen(tp) + 1, sizeof(*consumed));
         char tmp_input;
-        int counter;  // for counting correct letters
-        int counter_r; // checks for repeats;
+        int counter;		// count correctly guessed characters
+        int counter_r;  	// checks for repeats guesses
         char input;
-        unsigned tries = 0;  // for counting valid incorrect attempts
+        unsigned tries = 0;  	// for counting valid incorrect attempts
 
-        // initialize hidden and consumed arrays
+        // initialize hidden and consumed arrays to an '_'
+	// Todo: swap for a memset '_' strlen(tp) - 1
         for (unsigned long i = 0; i <= (strlen(tp)); i++) {
                 if(i != strlen(tp)) {
                         if(ispunct(tp[i]) != 0) {
@@ -194,7 +166,7 @@ void game_console(char *tp)
                 }
         }
 
-        // initialize tmp
+        // initialize tmp to a lower-case variant.
         for (int i = 0; i <= (int)(strlen(tp)); ++i) {
                 tmp[i] = tolower(tp[i]);  // sets the tmp word to all lower
         }
@@ -224,13 +196,14 @@ void game_console(char *tp)
                         break;
                 }
                 tmp_input = input;
-                // checks to see if a correct guess has already been guessed
+
+                // check to see if a correct guess has already been guessed
                 if(strchr(consumed, tolower(tmp_input))) {
                         counter_r++;
                 }
 
                 for(unsigned long i = 0; i <= (strlen(tp) - 1); i++) {
-                        // checks take letter-case into consideration
+                        // check take letter-case into consideration
                         if (tolower(tmp_input) == tmp[i])  {
                                 hidden[i] = tp[i];  // assign the original char
                                 consumed[i] = tmp_input;
@@ -268,30 +241,20 @@ void game_console(char *tp)
 	free(consumed);
 }
 
-/*
- * Validate user input. This is where if the user outright guesses the correct
- * word, they get full credit and win the game.
- *
- * char *tp - a pointer to the target array.
- *
- * return - char - gets assigned to input in user_console().
- */
 char input_val(char *tp)
 {
         char line[MAX];
-        char tmp_line[MAX];  // for case insensitive comparison
-        char tmp_target[MAX];  // for case insensitive comparison
+        char tmp_line[MAX];
+        char tmp_target[MAX];
 
         fgets(line, sizeof(line), stdin);
 
         // convert both temp arrays to lower for comparisons
         for (int i = 0; i <= (int)(strlen(tp)); ++i) {
-                // sets the tmp word to all lower
                 tmp_target[i] = tolower(tp[i]);
         }
 
         for (int i = 0; i <= (int)(strlen(line)); ++i) {
-                // sets the tmp word to all lower
                 tmp_line[i] = tolower(line[i]);
         }
 
@@ -310,12 +273,6 @@ char input_val(char *tp)
         }
 }
 
-/*
- * Set stats to the file .hangman. If the file does not exist, or is unable to
- * open, display an error message.
- *
- * return - void
- */
 void set_stats(void)
 {
         FILE *outfile;  // outfile file pointer (of)
