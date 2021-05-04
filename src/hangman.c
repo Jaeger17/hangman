@@ -212,6 +212,7 @@ void game_console(char *tp)
 
                 if(tries == 6) {
                         printf("You lose!\n");
+			printf("The word was: %s\n", tp);
                         game.lose++;
                         break;
                 }
