@@ -1,0 +1,34 @@
+.\" Manpage for hangman.
+.\" contact jaeger17@protonmail.com for questions or concerns
+.TH man 8 "05/04/2021" "6.0" "hangman man page"
+.SH NAME
+hangman \- Play the classic hangman game.
+.SH SYNOPSIS
+.B hangman [ARGUMENT]
+.SH DESCRIPTION
+"Hangman" is a game where the player is trying to guess an unknown word, letter 
+by letter. At the start of the game, the player only knows the length of the word. 
+If the player guesses a letter present in the word, all instances of that letter 
+are revealed, and play continues. If the player guesses all the letters in the 
+word, the word is revealed in its entirety, the player wins. If a player guesses 
+a letter that is not in the word, a number indicating the incorrect guesses is 
+drawn to the left of the board and a stick figure body part  is drawn above. 
+If incorrect guesses reach 6, the game is over, the word is revealed and the 
+player loses.
+.SH ARGUMENTS
+.IP Default
+The program will look to ".words" for a list of words to pull a random word from. 
+If that file does not exist or can't be opened the game will exit.
+.IP [<file>]
+The program will look to [<file>] for a list of words to pull from. If that file 
+does not exist or can't be opened the game will exit.
+.SH EXAMPLES
+.IP\- "./hangman"
+play game with a word selected from "~/.words".
+.IP\- "./hangman [<file>]"
+play game with a word selected from [<file>].
+.SH BUGS
+No known bugs.
+Report bugs to jaeger17@protonmail.com
+.SH AUTHOR
+Jaeger17 (jaeger17@protonmail.com)
