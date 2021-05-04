@@ -142,9 +142,9 @@ void game_console(char *tp)
 	 * Consumed will "eat" valid correct answers so that I can count them
          * as incorrect if the user attempts to guess it again.
 	 */
-        char *tmp = calloc(strlen(tp) + 1, sizeof(*tmp));
-        char *hidden = calloc(strlen(tp) + 1, sizeof(*hidden));
-        char *consumed = calloc(strlen(tp) + 1, sizeof(*consumed));
+        char *tmp = malloc(strlen(tp) + 1 * sizeof(*tmp));
+        char *hidden = malloc(strlen(tp) - 1 * sizeof(*hidden));
+        char *consumed = malloc(strlen(tp) + 1 * sizeof(*consumed));
         char tmp_input;
         int counter;		// count correctly guessed characters
         int counter_r;  	// checks for repeats guesses
@@ -152,19 +152,8 @@ void game_console(char *tp)
         unsigned tries = 0;  	// for counting valid incorrect attempts
 
         // initialize hidden and consumed arrays to an '_'
-	// Todo: swap for a memset '_' strlen(tp) - 1
-        for (unsigned long i = 0; i <= (strlen(tp)); i++) {
-                if(i != strlen(tp)) {
-                        if(ispunct(tp[i]) != 0) {
-                                hidden[i] = tp[i];
-                        } else {
-                                hidden[i] = '_';
-                                consumed[i] = '_';
-                        }
-                } else {
-                        hidden[i] = '\0';
-                }
-        }
+	memset(hidden,'_', strlen(tp));
+	memset(consumed,'_', strlen(tp));
 
         // initialize tmp to a lower-case variant.
         for (int i = 0; i <= (int)(strlen(tp)); ++i) {
@@ -176,6 +165,7 @@ void game_console(char *tp)
                 counter = 0;
                 counter_r = 0;
                 printf("%d ", tries);
+
                 for (unsigned long i = 0; i <= (strlen(tp) - 1); i++) {
                         printf("%c ", hidden[i]);
                 }
@@ -185,6 +175,7 @@ void game_console(char *tp)
                 if(input == 33) {
                         continue;
                 } else if(input == 0) {
+			puts("Input == 0");
                         printf("  ");
                         for (unsigned long i = 0; i <= (strlen(tp) - 1); i++) {
                                 printf("%c ", tp[i]);
@@ -210,6 +201,8 @@ void game_console(char *tp)
                                 counter++;
                         }
                 }
+
+		hidden[strlen(tp)] = '\0';
 
                 // if wrong answer or already correctly guessed, add 1 to tries
                 if(counter == 0 || counter_r != 0) {
@@ -258,8 +251,10 @@ char input_val(char *tp)
                 tmp_line[i] = tolower(line[i]);
         }
 
-        // account for the newline in the string comparison
-        if (strcmp(tmp_line, tmp_target) == 10) {
+	//set last char to NULL instead of newline for better comparisons
+	tmp_line[strlen(tmp_line) - 1] = '\0';
+
+        if (strcmp(tmp_line, tmp_target) == 0) {
                 return 0;
 
         } else if ((strlen(line) == 2) && ((line[0] >= 'a' && line[0] <= 'z') ||
@@ -275,7 +270,7 @@ char input_val(char *tp)
 
 void set_stats(void)
 {
-        FILE *outfile;  // outfile file pointer (of)
+        FILE *outfile;
 
         outfile = fopen("./.hangman", "w+");
         if(!outfile) {
