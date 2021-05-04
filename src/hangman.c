@@ -12,6 +12,14 @@ struct stats {
   int score;
 } game;
 
+void clear_screen()
+{
+	#ifdef WINDOWS
+    		system("cls");
+	#else
+    		system("clear");
+#endif
+}
 
 int main(int argc, char *argv[])
 {
@@ -142,14 +150,23 @@ void game_console(char *tp)
 	 * Consumed will "eat" valid correct answers so that I can count them
          * as incorrect if the user attempts to guess it again.
 	 */
-        char *tmp = malloc(strlen(tp) + 1 * sizeof(*tmp));
-        char *hidden = malloc(strlen(tp) - 1 * sizeof(*hidden));
-        char *consumed = malloc(strlen(tp) + 1 * sizeof(*consumed));
+        char *tmp = malloc(strlen(tp) * sizeof(*tmp));
+        char *hidden = malloc(strlen(tp) * sizeof(*hidden));
+        char *consumed = malloc(strlen(tp) * sizeof(*consumed));
         char tmp_input;
         int counter;		// count correctly guessed characters
         int counter_r;  	// checks for repeats guesses
         char input;
         unsigned tries = 0;  	// for counting valid incorrect attempts
+	char image[7][10] = {
+		{' ', '_', '_', '_', '_', ' ', ' ', ' ', ' ', '\n' },
+		{'|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\n' },
+		{'|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\n' },
+		{'|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\n' },
+		{'|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\n' },
+		{'|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\n' },
+		{'|', '_', '_', '_', '_', '_', '_', ' ', ' ', '\n' }
+	};
 
         // initialize hidden and consumed arrays to an '_'
 	memset(hidden,'_', strlen(tp));
@@ -160,22 +177,43 @@ void game_console(char *tp)
                 tmp[i] = tolower(tp[i]);  // sets the tmp word to all lower
         }
         puts("");
-        game.games++;
         while(true) {
                 counter = 0;
                 counter_r = 0;
+		clear_screen();
+		printf("game %d. %d Win/%d Loss. Average score: %.2f\n",
+                       game.games,
+                       game.win,
+                       game.lose,
+                       ((float)game.score/(float)game.games));
+		for (int row = 0; row < 7; row++)
+		{
+			for (int col = 0; col < 10; col++)
+			{
+				printf("%c", image[row][col]);
+			}
+			
+		}
+
+		if(tries == 6) {
+                        printf("You lose!\n");
+			printf("The word was: %s\n", tp);
+                        game.lose++;
+                        break;
+                }
+
                 printf("%d ", tries);
 
-                for (unsigned long i = 0; i <= (strlen(tp) - 1); i++) {
+                for (size_t i = 0; i <= (strlen(tp) - 1); i++) {
                         printf("%c ", hidden[i]);
                 }
                 printf(":");
                 input = input_val(tp);
-                // using ascii character '!' 33 as my error check
+                
+		// using ascii character '!' 33 as my error check
                 if(input == 33) {
                         continue;
                 } else if(input == 0) {
-			puts("Input == 0");
                         printf("  ");
                         for (unsigned long i = 0; i <= (strlen(tp) - 1); i++) {
                                 printf("%c ", tp[i]);
@@ -202,20 +240,34 @@ void game_console(char *tp)
                         }
                 }
 
-		hidden[strlen(tp)] = '\0';
-
                 // if wrong answer or already correctly guessed, add 1 to tries
                 if(counter == 0 || counter_r != 0) {
                         tries++;
+			switch (tries) {
+			case 1:
+				image[1][4] = 'O';
+				break;
+			case 2:
+				image[2][4] = '|';
+				break;
+			case 3:
+				image[2][3] = '/';
+				break;
+			case 4:
+				image[2][5] = '\\';
+				break;
+			case 5:
+				image[3][3] = '/';
+				break;
+			case 6:
+				image[3][5] = '\\';
+				break;
+			default:
+				break;
+			}
                         game.score++;
                 }
-
-                if(tries == 6) {
-                        printf("You lose!\n");
-			printf("The word was: %s\n", tp);
-                        game.lose++;
-                        break;
-                }
+		
 
                 if(strcmp(hidden, tp) == 0) {
                         printf("  ");
@@ -233,6 +285,7 @@ void game_console(char *tp)
 	free(tmp);
 	free(hidden);
 	free(consumed);
+	game.games++;
 }
 
 char input_val(char *tp)
@@ -281,3 +334,5 @@ void set_stats(void)
                 fclose(outfile);
         }
 }
+
+
